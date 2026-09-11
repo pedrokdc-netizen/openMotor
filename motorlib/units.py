@@ -9,6 +9,7 @@ unitLabels = {
     'N': 'Force',
     'Ns': 'Impulse',
     'Pa': 'Pressure',
+    'm^3': 'Volume',
     'kg': 'Mass',
     'kg/m^3': 'Density',
     'kg/s': 'Mass Flow',
@@ -40,6 +41,9 @@ unitTable = [
 
     ('Pa', 'MPa', 1/1000000),
     ('Pa', 'psi', 1/6895),
+
+    ('m^3', 'cm^3', 1000000),
+    ('m^3', 'in^3', 61023.7),
 
     ('kg', 'g', 1000),
     ('kg', 'lb', 2.205),
