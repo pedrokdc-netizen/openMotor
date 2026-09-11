@@ -16,17 +16,19 @@ DEFAULT_PREFERENCES = {
         'flowSeparationWarnPercent': 0.05
     },
     'units': {
-        'm': 'in',
-        'm^3': 'in^3',
-        'm/s': 'ft/s',
-        'Pa': 'psi',
-        'kg': 'lb',
-        'kg/m^3': 'lb/in^3',
-        'kg/s': 'lb/s',
-        'kg/(m^2*s)': 'lb/(in^2*s)',
-        '(m*Pa)/s': '(in*psi)/s',
-        'm/(s*Pa)': 'thou/(s*psi)',
-        'm/(s*Pa^n)': 'in/(s*psi^n)'
+        'm': 'm',
+        'm^3': 'm^3',
+        'm/s': 'm/s',
+        'N': 'N',
+        'Ns': 'Ns',
+        'Pa': 'Pa',
+        'kg': 'kg',
+        'kg/m^3': 'kg/m^3',
+        'kg/s': 'kg/s',
+        'kg/(m^2*s)': 'kg/(m^2*s)',
+        '(m*Pa)/s': '(m*Pa)/s',
+        'm/(s*Pa)': 'um/(s*mPa)',
+        'm/(s*Pa^n)': 'mm/(s*Pa^n)'
     }
 }
 
