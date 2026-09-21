@@ -98,6 +98,31 @@ The output directory contains all successful results, the Pareto front,
 full-resolution selected motor files, a JSON summary, and comparison plots.
 All values in YAML use openMotor's SI units.
 
+Engineering Report Generator
+----------------------------
+The standalone report generator loads an openMotor `.ric` file, runs the
+simulation locally, creates engineering plots, and fills a bilingual
+English/Portuguese Word report. Runtime report generation is deterministic and
+does not use an LLM or require network access. The report template wording and
+style are stored in `tools/report-template.yaml`.
+
+Generate a report from a saved configuration:
+```
+python tools/openmotor_report.py run my-report.yaml
+```
+
+Open the desktop report interface:
+```
+python tools/openmotor_report.py gui my-report.yaml
+```
+
+Copy `tools/report-example.yaml` to configure document metadata, simulation
+resolution, figure quality, input motor, output document, and template. The
+generated report includes document control, inputs, propellant and grain data,
+nozzle geometry, performance tables, pressure and thrust histories, diagnostic
+curves, grain regression figures, engineering-limit checks, alerts,
+conclusions, and simulation settings.
+
 Data Files
 -----------
 openMotor uses [YAML](https://en.wikipedia.org/wiki/YAML) for data storage. Motor files have the extension `.ric` to differentiate them, but internally they are YAML and can be edited in a text editor if desired. The recommended MIME type for these files is `application/vnd.openmotor+yaml`.
