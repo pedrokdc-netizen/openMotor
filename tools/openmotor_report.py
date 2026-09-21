@@ -24,6 +24,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from motorlib.motor import Motor
+from motorlib.longitudinal import draw_motor_cross_section
 from motorlib.simResult import SimAlertLevel
 from tools.openmotor_optimizer import load_motor
 
@@ -263,6 +264,21 @@ def generate_regression_figure(motor, path, dpi, mapDim, contourCount):
         axis.axis("off")
     figure.tight_layout()
     figure.savefig(path, dpi=dpi, transparent=False)
+
+
+def generate_longitudinal_figure(motor, path, dpi, contourCount):
+    figure = Figure(figsize=(9.0, 4.0))
+    axis = figure.subplots()
+    fractions = np.linspace(0, 0.9, contourCount + 1)[1:]
+    draw_motor_cross_section(
+        axis,
+        motor,
+        regressions=[0] * len(motor.grains),
+        contour_fractions=fractions,
+        show_labels=True,
+    )
+    figure.tight_layout()
+    figure.savefig(path, dpi=dpi)
 
 
 def set_cell_shading(cell, fill):
@@ -652,11 +668,19 @@ def build_document(config, template, motor, result, figures):
 
     document.add_heading(sections["regression"], level=1)
     document.add_picture(
+        str(figures["longitudinal"]), width=Inches(6.4)
+    )
+    caption = document.add_paragraph(
+        "Figure 3. Coherent longitudinal motor cross-section / "
+        "Figura 3. Seção longitudinal coerente do motor"
+    )
+    caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    document.add_picture(
         str(figures["regression"]), width=Inches(6.4)
     )
     caption = document.add_paragraph(
-        "Figure 3. Grain cross-sections and regression contours / "
-        "Figura 3. Secoes dos graos e contornos de regressao"
+        "Figure 4. Grain transverse sections and regression contours / "
+        "Figura 4. Seções transversais dos grãos e contornos de regressão"
     )
     caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
@@ -749,10 +773,17 @@ def create_figures(config, motor, result, directory):
     figures = {
         "performance": directory / "performance.png",
         "diagnostics": directory / "diagnostics.png",
+        "longitudinal": directory / "longitudinal-section.png",
         "regression": directory / "grain-regression.png",
     }
     generate_performance_figure(result, figures["performance"], dpi)
     generate_diagnostics_figure(result, figures["diagnostics"], dpi)
+    generate_longitudinal_figure(
+        motor,
+        figures["longitudinal"],
+        dpi,
+        int(settings.get("regression_contours", 7)),
+    )
     generate_regression_figure(
         motor,
         figures["regression"],

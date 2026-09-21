@@ -64,7 +64,7 @@ class ReportGeneratorMethods(unittest.TestCase):
             self.assertIn("INTERNAL BALLISTICS MOTOR REPORT", text)
             self.assertIn("SIMULATED PERFORMANCE", text)
             self.assertIn("CONCLUSIONS / CONCLUSÕES", text)
-            self.assertGreaterEqual(len(document.inline_shapes), 3)
+            self.assertGreaterEqual(len(document.inline_shapes), 4)
 
 
 if __name__ == "__main__":
