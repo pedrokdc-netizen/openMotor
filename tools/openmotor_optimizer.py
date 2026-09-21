@@ -34,6 +34,7 @@ METRIC_UNITS = {
     "peak_pressure": "Pa",
     "average_pressure": "Pa",
     "pressure_spread": "Pa",
+    "relative_pressure_spread": "",
     "propellant_mass": "kg",
     "average_thrust": "N",
     "peak_thrust": "N",
@@ -202,12 +203,18 @@ def apply_variables(data, variables, values):
 def collect_metrics(result):
     peakPressure = result.getMaxPressure()
     averagePressure = result.getAveragePressure()
+    relativePressureSpread = (
+        (peakPressure - averagePressure) / averagePressure
+        if averagePressure > 0
+        else math.inf
+    )
     return {
         "impulse": result.getImpulse(),
         "burn_time": result.getBurnTime(),
         "peak_pressure": peakPressure,
         "average_pressure": averagePressure,
         "pressure_spread": peakPressure - averagePressure,
+        "relative_pressure_spread": relativePressureSpread,
         "propellant_mass": result.getPropellantMass(),
         "average_thrust": result.getAverageForce(),
         "peak_thrust": result.channels["force"].getMax(),

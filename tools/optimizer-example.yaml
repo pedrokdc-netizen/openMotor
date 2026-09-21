@@ -43,7 +43,7 @@ constraints:
     max: 20
 
 objectives:
-  - metric: pressure_spread
+  - metric: relative_pressure_spread
     direction: minimize
   - metric: propellant_mass
     direction: minimize

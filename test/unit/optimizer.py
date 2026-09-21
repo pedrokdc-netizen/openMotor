@@ -5,6 +5,7 @@ from pathlib import Path
 
 from tools.openmotor_optimizer import (
     apply_variables,
+    collect_metrics,
     load_motor,
     pareto_front,
     parse_path,
@@ -12,7 +13,46 @@ from tools.openmotor_optimizer import (
 )
 
 
+class FakeResult:
+
+    def getMaxPressure(self):
+        return 6e6
+
+    def getAveragePressure(self):
+        return 4e6
+
+    def getImpulse(self):
+        return 16000
+
+    def getBurnTime(self):
+        return 6.5
+
+    def getPropellantMass(self):
+        return 12
+
+    def getAverageForce(self):
+        return 2400
+
+    def getISP(self):
+        return 140
+
+    def getPeakMassFlux(self):
+        return 800
+
+    def getPeakMachNumber(self):
+        return 0.3
+
+    def getPortRatio(self):
+        return 3
+
+    channels = {"force": type("Channel", (), {"getMax": lambda self: 3000})()}
+
+
 class OptimizerMethods(unittest.TestCase):
+
+    def test_relative_pressure_spread(self):
+        metrics = collect_metrics(FakeResult())
+        self.assertEqual(metrics["relative_pressure_spread"], 0.5)
 
     def test_property_paths(self):
         self.assertEqual(
