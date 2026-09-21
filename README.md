@@ -72,6 +72,32 @@ Once everything is set up, you can start openMotor by running: `python main.py`
 
 ###### Note: On some systems, Python 2 and 3 are installed simultaneously, so you may have to specify which version to run when creating the venv. After the venv has been activated, the programs `python` and `pip` are aliased to the python runtime specific for your venv, so use those (instead of `pip3` and `python3`, on e.g. Debian Linux)
 
+Standalone Optimizer
+--------------------
+The configurable optimizer can vary any numeric motor property, apply output
+constraints, calculate a multi-objective Pareto front, save selected `.ric`
+files, and generate Pareto and pressure plots. The GUI and command-line modes
+use the same YAML configuration format.
+
+Copy `tools/optimizer-example.yaml`, then edit the motor path, variable paths,
+ranges, constraints, and objectives. A variable can update several linked
+properties by listing multiple paths, for example the core diameter of several
+grains.
+
+Run from the command line:
+```
+python tools/openmotor_optimizer.py run my-optimizer.yaml
+```
+
+Open the desktop interface, optionally with an existing configuration:
+```
+python tools/openmotor_optimizer.py gui my-optimizer.yaml
+```
+
+The output directory contains all successful results, the Pareto front,
+full-resolution selected motor files, a JSON summary, and comparison plots.
+All values in YAML use openMotor's SI units.
+
 Data Files
 -----------
 openMotor uses [YAML](https://en.wikipedia.org/wiki/YAML) for data storage. Motor files have the extension `.ric` to differentiate them, but internally they are YAML and can be edited in a text editor if desired. The recommended MIME type for these files is `application/vnd.openmotor+yaml`.

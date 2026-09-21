@@ -54,6 +54,7 @@ class HemisphericalGrainMethods(unittest.TestCase):
             grain.getSurfaceAreaAtRegression(0),
             expectedArea,
         )
+        self.assertIsNone(grain.regressionMap)
 
     def test_volume_loss_matches_integrated_surface_area(self):
         grain = self.makeTop()

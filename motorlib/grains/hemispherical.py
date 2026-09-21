@@ -35,6 +35,7 @@ class AxisymmetricHemisphericalGrain(Grain):
         self.coreMap = None
         self.regressionMap = None
         self.wallWeb = 0
+        self.geometryInitialized = False
         self._syncLength()
 
     def _syncLength(self):
@@ -47,6 +48,7 @@ class AxisymmetricHemisphericalGrain(Grain):
         if prop == "length":
             return
         super().setProperty(prop, value)
+        self.geometryInitialized = False
         if prop == "diameter":
             self._syncLength()
 
@@ -85,12 +87,15 @@ class AxisymmetricHemisphericalGrain(Grain):
             levelSet, dx=(axialStep, radialStep)
         )
         self.wallWeb = self._getWallWeb()
+        self.geometryInitialized = True
 
     def simulationSetup(self, config):
-        self._buildGeometry(config.getProperty("mapDim"))
+        self.mapDim = config.getProperty("mapDim")
+        self.wallWeb = self._getWallWeb()
+        self.geometryInitialized = True
 
     def _ensureGeometry(self):
-        if self.regressionMap is None:
+        if not self.geometryInitialized:
             raise ValueError("Grain geometry must be initialized before use")
 
     def getSurfaceAreaAtRegression(self, regDist):
