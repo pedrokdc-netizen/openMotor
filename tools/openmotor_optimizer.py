@@ -75,6 +75,23 @@ def set_path(data, path, value):
     target[tokens[-1]] = value
 
 
+def numeric_property_paths(data, prefix=""):
+    """Return sorted paths for all numeric values in a motor dictionary."""
+    paths = []
+    if isinstance(data, dict):
+        for key, value in data.items():
+            path = f"{prefix}.{key}" if prefix else str(key)
+            paths.extend(numeric_property_paths(value, path))
+    elif isinstance(data, list):
+        for index, value in enumerate(data):
+            paths.extend(
+                numeric_property_paths(value, f"{prefix}[{index}]")
+            )
+    elif isinstance(data, (int, float)) and not isinstance(data, bool):
+        paths.append(prefix)
+    return sorted(paths)
+
+
 def load_motor(path):
     """Load the data and serialization trailer from an openMotor file."""
     text = Path(path).read_text(encoding="utf-8")

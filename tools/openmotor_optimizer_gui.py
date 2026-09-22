@@ -35,6 +35,8 @@ from PyQt6.QtWidgets import (
 from tools.openmotor_optimizer import (
     METRIC_UNITS,
     load_config,
+    load_motor,
+    numeric_property_paths,
     run_optimization,
     validate_config,
 )
@@ -69,6 +71,7 @@ class OptimizerWindow(QMainWindow):
         self.resize(1180, 820)
         self.thread = None
         self.lastOutputDirectory = None
+        self.variablePathOptions = []
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -87,6 +90,9 @@ class OptimizerWindow(QMainWindow):
         group = QGroupBox("Files")
         layout = QGridLayout(group)
         self.motorPath = QLineEdit()
+        self.motorPath.editingFinished.connect(
+            self.refreshVariablePathOptions
+        )
         self.outputPath = QLineEdit()
         motorBrowse = QPushButton("Browse...")
         outputBrowse = QPushButton("Browse...")
@@ -133,7 +139,7 @@ class OptimizerWindow(QMainWindow):
     def _buildConfigurationTabs(self):
         tabs = QTabWidget()
         self.variables = self._table(
-            ["Name", "Property paths (; separated)", "Minimum", "Maximum", "Type"]
+            ["Name", "Property path(s)", "Minimum", "Maximum", "Type"]
         )
         self.constraints = self._table(["Metric", "Minimum", "Maximum"])
         self.objectives = self._table(["Metric", "Direction"])
@@ -242,14 +248,17 @@ class OptimizerWindow(QMainWindow):
         self.variables.insertRow(row)
         values = (
             variable["name"],
-            "; ".join(variable["paths"]),
             variable["min"],
             variable["max"],
         )
-        for column, value in enumerate(values):
+        for column, value in zip((0, 2, 3), values):
             self.variables.setItem(
                 row, column, QTableWidgetItem(str(value))
             )
+        pathCombo = self._propertyPathCombo(
+            "; ".join(variable["paths"])
+        )
+        self.variables.setCellWidget(row, 1, pathCombo)
         combo = QComboBox()
         combo.addItems(["float", "integer"])
         combo.setCurrentText(variable.get("type", "float"))
@@ -293,6 +302,35 @@ class OptimizerWindow(QMainWindow):
         combo.setCurrentText(value)
         return combo
 
+    def _propertyPathCombo(self, value=""):
+        combo = QComboBox()
+        combo.setEditable(True)
+        combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        combo.addItems(self.variablePathOptions)
+        combo.setCurrentText(value)
+        combo.setToolTip(
+            "Select one numeric motor property, or enter multiple paths "
+            "separated by semicolons to link them."
+        )
+        return combo
+
+    def refreshVariablePathOptions(self):
+        motorPath = self.motorPath.text().strip()
+        try:
+            motorData, _ = load_motor(motorPath)
+            self.variablePathOptions = numeric_property_paths(motorData)
+        except (OSError, TypeError, ValueError, yaml.YAMLError):
+            self.variablePathOptions = []
+
+        for row in range(self.variables.rowCount()):
+            combo = self.variables.cellWidget(row, 1)
+            if combo is None:
+                continue
+            current = combo.currentText()
+            combo.clear()
+            combo.addItems(self.variablePathOptions)
+            combo.setCurrentText(current)
+
     @staticmethod
     def removeRow(table):
         row = table.currentRow()
@@ -305,6 +343,7 @@ class OptimizerWindow(QMainWindow):
         )
         if path:
             self.motorPath.setText(path)
+            self.refreshVariablePathOptions()
 
     def browseOutput(self):
         path = QFileDialog.getExistingDirectory(
@@ -330,6 +369,7 @@ class OptimizerWindow(QMainWindow):
 
     def applyConfiguration(self, config):
         self.motorPath.setText(config["motor"])
+        self.refreshVariablePathOptions()
         self.outputPath.setText(config["output_directory"])
         self.samples.setValue(int(config.get("samples", 2000)))
         self.workers.setValue(int(config.get("workers", 1)))
@@ -371,7 +411,9 @@ class OptimizerWindow(QMainWindow):
         for row in range(self.variables.rowCount()):
             paths = [
                 path.strip()
-                for path in self._cell(self.variables, row, 1).split(";")
+                for path in self.variables.cellWidget(
+                    row, 1
+                ).currentText().split(";")
                 if path.strip()
             ]
             variables.append(
@@ -530,4 +572,3 @@ def launch_gui(configPath=None):
     window = OptimizerWindow(configPath)
     window.show()
     application.exec()
-

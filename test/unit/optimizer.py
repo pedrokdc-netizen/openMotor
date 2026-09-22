@@ -7,6 +7,7 @@ from tools.openmotor_optimizer import (
     apply_variables,
     collect_metrics,
     load_motor,
+    numeric_property_paths,
     pareto_front,
     parse_path,
     run_optimization,
@@ -61,6 +62,28 @@ class OptimizerMethods(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             parse_path("grains..properties")
+
+    def test_numeric_property_paths(self):
+        data = {
+            "grains": [
+                {
+                    "type": "BATES",
+                    "properties": {
+                        "diameter": 0.1,
+                        "numPoints": 6,
+                        "inverted": False,
+                    },
+                }
+            ],
+            "name": "test",
+        }
+        self.assertEqual(
+            numeric_property_paths(data),
+            [
+                "grains[0].properties.diameter",
+                "grains[0].properties.numPoints",
+            ],
+        )
 
     def test_linked_variable_updates_all_paths(self):
         data = {
